@@ -1,0 +1,287 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="utf-8">
+		<title>Adding Labels</title>
+		<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/d3/3.5.6/d3.min.js"></script>
+		<style type="text/css">
+
+			body {
+				background-color: white;
+				font-family: Arial, sans-serif;
+				font-size: 20px;
+			}
+
+			h1{
+				color: #333399;
+				font-size: 2.0em;
+				margin: 20px 0 0 200px;
+			}
+			h3{
+				color: #333399;
+				font-size: 1.5em;
+				margin: 0 0 20px 200px;
+			}
+
+			p {
+				margin-left: 200px;
+				font-size: 11pt;
+				color: black;
+			}
+			#main{
+				width: 1000px;
+				display: block;
+				margin: 0 auto;
+			}
+			div.IVotes {
+				color: #FF0099;
+				display: inline;
+			}
+			div.VVotes {
+				color: #0099FF;
+				display: inline;
+			}
+
+			svg {
+				background-color: #d3d3d3;
+				display: block;
+				margin: 0 auto;
+			}
+
+			circle {
+				stroke-width: 1;
+			}
+
+			circle.IVotes {
+				fill: #FF0099;
+			}
+
+			circle.VVotes {
+				fill: #0099FF;
+			}
+
+			circle:hover {
+				opacity: .5;
+			}
+
+			line.grid {
+				stroke: #eee;
+			}
+
+			line.between {
+				stroke: black;
+			}
+
+			.axis path,
+			.axis line {
+				fill: none;
+				stroke: black;
+				shape-rendering: crispEdges;
+			}
+
+			.axis text {
+				font-family: sans-serif;
+				font-size: 11px;
+			}
+
+			.xlabel {
+				font-famile: sans-serif;
+				font-size: 11px;
+				color: gray;
+			}
+
+		</style>
+	</head>
+	<body>
+
+		<div id="main">
+			<h1>Neonatal Mortality Rate by World Region: </h1>
+			<h3><div class="IVotes">1990</div> versus <div class="VVotes">2013</div></h3>
+			<p>This dotplot shows the difference in the neonatal morality rate from 1990 to 2013 by region</p>
+			<p>Note: Neonatal mortality rate: Probability of dying during the first month of life, expressed per 1,000 live births. Source: UNICEF data, 2015.</p>
+		</div>
+		<script type="text/javascript">
+
+		// this is the size of the svg container -- the white part
+			var fullwidth = 1000,
+				fullheight = 500;
+
+			// these are the margins around the graph. Axes labels go in margins.
+			var margin = {top: 20, right: 25, bottom: 20, left: 200};
+
+			var width = 1000 - margin.left - margin.right,
+    		height = 500 - margin.top - margin.bottom;
+
+			var widthScale = d3.scale.linear()
+								.range([ 0, width]);
+
+			var heightScale = d3.scale.ordinal()
+								.rangeRoundBands([ margin.top, height], 0.2);
+
+			var xAxis = d3.svg.axis()
+							.scale(widthScale)
+							.orient("bottom");
+
+			var yAxis = d3.svg.axis()
+							.scale(heightScale)
+							.orient("left")
+							.innerTickSize([0]);
+
+			var svg = d3.select("body")
+						.append("svg")
+						.attr("width", fullwidth)
+						.attr("height", fullheight);
+
+
+			d3.csv("Valid.csv", function(error, data) {
+
+				if (error) {
+					console.log("error reading file");
+				}
+
+				data.sort(function(a, b) {
+					return d3.descending(+a.V, +b.IVotes);
+				});
+
+
+				widthScale.domain([0, 100]);
+
+				// js map: will make a new array out of all the d.region fields
+				heightScale.domain(data.map(function(d) { return d.District; } ));
+
+
+				// Make the faint lines from y labels to highest dot
+
+				var linesGrid = svg.selectAll("lines.grid")
+					.data(data)
+					.enter()
+					.append("line");
+
+				linesGrid.attr("class", "grid")
+					.attr("x1", margin.left)
+					.attr("y1", function(d) {
+						return heightScale(d.District) + heightScale.rangeBand()/2;
+					})
+					.attr("x2", function(d) {
+						return margin.left + widthScale(+d.VVotes);
+
+					})
+					.attr("y2", function(d) {
+						return heightScale(d.District) + heightScale.rangeBand()/2;
+					});
+
+				// Make the dotted lines between the dots
+
+				var linesBetween = svg.selectAll("lines.between")
+					.data(data)
+					.enter()
+					.append("line");
+
+				linesBetween.attr("class", "between")
+					.attr("x1", function(d) {
+						return margin.left + widthScale(+d.IVotes);
+					})
+					.attr("y1", function(d) {
+						return heightScale(d.District) + heightScale.rangeBand()/2;
+					})
+					.attr("x2", function(d) {
+						return margin.left + widthScale(d.VVotes);
+					})
+					.attr("y2", function(d) {
+						return heightScale(d.District) + heightScale.rangeBand()/2;
+					})
+					.attr("stroke-dasharray", "5,5")
+					.attr("stroke-width", function(d, i) {
+						if (d.District === "World") {
+							return "1";
+						} else {
+							return "0.5";
+						}
+					});
+
+
+				// Make the dots for 1990
+
+				var dotsIVotes = svg.selectAll("circle.IVotes")
+						.data(data)
+						.enter()
+						.append("circle");
+
+				dotsIVotes
+					.attr("class", "IVotes")
+					.attr("cx", function(d) {
+						return margin.left + widthScale(+d.IVotes);
+					})
+					.attr("r", heightScale.rangeBand()/2)
+					.attr("cy", function(d) {
+						return heightScale(d.District) + heightScale.rangeBand()/2;
+					})
+					.style("fill", function(d){
+						if (d.District === "Total Votes") {
+							return "#333399";
+						}
+					})
+					.append("title")
+					.text(function(d) {
+						return d.District + " in IVotes: " + d.IVotes + "%";
+					});
+
+				// Make the dots for 2013
+
+				var dotsVotes = svg.selectAll("circle.VVotes")
+						.data(data)
+						.enter()
+						.append("circle");
+
+				dotsVotes
+					.attr("class", "VVotes")
+					.attr("cx", function(d) {
+						return margin.left + widthScale(+d.VVotes);
+					})
+					.attr("r", heightScale.rangeBand()/2)
+					.attr("cy", function(d) {
+						return heightScale(d.District) + heightScale.rangeBand()/2;
+					})
+					.style("fill", function(d){
+						if (d.region === "World") {
+							return "#CC0000";
+						}
+					})
+					.append("title")
+					.text(function(d) {
+						return d.District + " in VVotes  : " + d.VVotes + "%";
+					});
+
+					// add the axes
+
+				svg.append("g")
+					.attr("class", "x axis")
+					.attr("transform", "translate(" + margin.left + "," + height + ")")
+					.call(xAxis);
+
+				svg.append("g")
+					.attr("class", "y axis")
+					.attr("transform", "translate(" + margin.left + ",0)")
+					.call(yAxis);
+
+				svg.append("text")
+					.attr("class", "xlabel")
+        	.attr("transform", "translate(" + (margin.left + width / 2) + " ," +
+        				(height + margin.bottom) + ")")
+        	.style("text-anchor", "middle")
+        	.attr("dy", "12")
+        	.text("Percent");
+
+       	// Style one of the Y labels bold:
+
+        // a hack that works if you can unravel the selections - to style "The World" bold in the axis label, which is the 8th element:
+        var allYAxisLabels = d3.selectAll("g.y.axis g.tick text")[0]; // un-nest array
+        d3.select(allYAxisLabels[5]).style("font-weight", "bold");
+        	// You could also use tick formatting to get a % sign on each axis tick
+
+			});
+
+		</script>
+
+	</body>
+</html>

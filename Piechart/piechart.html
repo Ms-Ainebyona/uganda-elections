@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <style>
+        .arc text {
+            font: 10px sans-serif;
+            text-anchor: middle;
+        }
+
+        .arc path {
+            stroke: #fff;
+        }
+
+        .title {
+            fill: teal;
+            font-weight: bold;
+        }
+        #tooltip {
+  position:absolute;
+  z-index: 10;
+  opacity: 0;
+  background: #fff;
+  padding: 10px;
+}
+    </style>
+    <script src="https://d3js.org/d3.v4.min.js"></script>
+</head>
+<body>
+    
+    <svg width="500" height="400"></svg>
+    <span id="legend"><svg width="500" height="400"></svg></span>
+    <div id="tooltip">
+        <div class="name"></div>
+        <div class="value"></div>
+      </div>
+
+    <script>
+
+        var svg = d3.select("svg"),
+            width = svg.attr("width"),
+            height = svg.attr("height"),
+            radius = Math.min(width, height) / 2;
+        
+        var g = svg.append("g")
+                   .attr("transform", "translate(" + width / 2 + "," + height / 2 + ")");
+
+        var color = d3.scaleOrdinal(['#0000ff','#990000','#009933','#9900ff','#ffff00','#99ccff']);
+
+        var pie = d3.pie().value(function(d) { 
+                return d.percent; 
+            });
+
+        var path = d3.arc()
+                     .outerRadius(radius - 20)
+                     .innerRadius(0);
+
+        var label = d3.arc()
+                      .outerRadius(radius)
+                      .innerRadius(radius - 150);
+        var hoveron = function(d) {
+            // console.log('d', d, 'event', event);
+            var div = document.getElementById('tooltip');
+            div.style.left = event.pageX + 'px';
+            div.style.top = event.pageY + 'px';
+
+            //Fill white to highlight
+            d3.select(this)
+                .style("fill", "white");
+
+            //Show the tooltip
+            d3.select("#tooltip")
+                .style("opacity", 1);
+
+            //Populate name in tooltip
+            d3.select("#tooltip .name")
+                .text(d.data.Candidates);
+
+            //Populate value in tooltip
+            d3.select("#tooltip .value")
+                .text(d.data.percent +"%"); 
+        }
+
+        var hoverout = function(d) {
+
+        //Restore original color fill
+            d3.select(this)
+            .style("fill", function(d) { return color(d.data.Candidates); });
+
+        //Hide the tooltip
+            d3.select("#tooltip")
+            .style("opacity", 0);    
+        }
+
+        d3.csv("Summary.csv", function(error, data) {
+            if (error) {
+                throw error;
+            }
+			
+            var arc = g.selectAll(".arc")
+                       .data(pie(data))
+                       .enter().append("g")
+                       .attr("class", "arc");
+
+            arc.append("path")
+               .attr("d", path)
+               .attr("fill", function(d) { return color(d.data.Candidates); })
+			   .on("mouseover", hoveron)
+	            .on("mouseleave", hoverout);
+			console.log(data);
+            console.log(arc);
+        
+            //arc.append("text")
+              // .attr("transform", function(d) { 
+                       // return "translate(" + label.centroid(d) + ")"; 
+               // })
+               //.text(function(d) { return d.data.Candidates + "\n "+ d.data.percent + "%"; })
+			   
+
+            });
+
+            svg.append("g")
+               .attr("transform", "translate(" + (width / 2 - 250) + "," + 10 + ")")
+               .append("text")
+               .text("Percentage of the Valid votes for each Presidentil Candidate")
+               .attr("class", "title")
+    </script>
+    <script>
+
+        // select the svg area
+        var svg = d3.select("#legend svg")
+        
+        // Handmade legend
+        svg.append("circle").attr("cx",200).attr("cy",130).attr("r", 6).style("fill", "#ffff00")
+        svg.append("circle").attr("cx",200).attr("cy",160).attr("r", 6).style("fill", "#0000ff")
+        svg.append("circle").attr("cx",200).attr("cy",190).attr("r", 6).style("fill", "#990000")
+        svg.append("circle").attr("cx",200).attr("cy",220).attr("r", 6).style("fill", "#009933")
+        svg.append("circle").attr("cx",200).attr("cy",250).attr("r", 6).style("fill", "#9900ff")
+        svg.append("circle").attr("cx",200).attr("cy",280).attr("r", 6).style("fill", "#99ccff")
+        svg.append("text").attr("x", 220).attr("y", 130).text("NRM").style("font-size", "15px").attr("alignment-baseline","middle")
+        svg.append("text").attr("x", 220).attr("y", 160).text("FDC").style("font-size", "15px").attr("alignment-baseline","middle")
+        svg.append("text").attr("x", 220).attr("y", 190).text("NUP").style("font-size", "15px").attr("alignment-baseline","middle")
+        svg.append("text").attr("x", 220).attr("y", 220).text("DP").style("font-size", "15px").attr("alignment-baseline","middle")
+        svg.append("text").attr("x", 220).attr("y", 250).text("ANT").style("font-size", "15px").attr("alignment-baseline","middle")
+        svg.append("text").attr("x", 220).attr("y", 280).text("Others").style("font-size", "15px").attr("alignment-baseline","middle")
+        
+        
+        </script>
+</body>
+</html>
