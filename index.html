@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="UTF-8">
+		<title>Presidential Elections 2021</title>
+
+		<!-- CSS libraries -->
+    	<link href="http://cdnjs.cloudflare.com/ajax/libs/skeleton/2.0.4/skeleton.min.css" rel="stylesheet" type="text/css">
+
+		<!-- Custom CSS styles -->
+		<link href="style.css" rel="stylesheet" type="text/css" >
+	</head>
+	<body>
+		<div class="container">
+			<h3> Geospatial distribution of votes for 2021 presidential elections</h3>
+			<div id="initial">
+				<!--<strong>Guidelines</strong>
+				<ul>
+					<li>Click on a district to show the district name and total valid votes</li>
+					<li>Th colors on the map indicate: Green for high number of votes to Red for low number of votes</li>
+				</ul>-->
+			</div>		
+
+			<div id="map"> <!-- Map container --> </div>
+
+			<div id="details"><!-- Details container --></div>
+
+		</div> 
+		<!--<div id="footer">
+				<strong>Note</strong> : Data and Score (Aggregate) used are only for test purposes, in building this map visualisation, and should not be used to inform interventions.
+			</div>-->
+
+		<!-- Mustache template, rendered later to show the details of a feature -->
+		
+	    <script id="template" type="x-tmpl-mustache">
+	      <h3 >{{ District }}</h3>
+	      <table>
+	          
+	        
+	          <th> AMURIAT OBOI PATRICK:</th>
+	          <td>{{ AMURIAT}}</td>
+	        </tr>
+	       	<tr>
+	          <th> KABULETA KIIZA JOSEPH:</th>
+	          <td>{{KABULETA }} </td>
+	        </tr>
+	        <tr>
+	          <th> KALEMBE NANCY LINDA:</th>
+	          <td>{{ KALEMBE}} </td>
+	        </tr>
+	        <tr>
+	          <th> KATUMBA JOHN:</th>
+	          <td>{{ KATUMBA }} </td>
+	        </tr>
+	        <tr>
+	          <th> KYAGULANYI SSENTAMU ROBERT:</th>
+	          <td>{{ KYAGULANYI }} </td>
+	        </tr>
+	        <tr>
+	          <th> MAO NORBERT:</th>
+	          <td>{{ NOBERT}} </td>
+	        </tr>
+	        <tr>
+	          <th> MAYAMBALA WILLY:</th>
+	          <td>{{ MAYAMBALA }} </td>
+	        </tr>
+	        <tr>
+	          <th> MUGISHA MUNTU GREGG:</th>
+	          <td>{{ MUNTU }} </td>
+	        </tr>
+	        <tr>
+	          <th> MWESIGYE FRED:</th>
+	          <td>{{ MWESIGYE }} </td>
+	        </tr>
+			<tr>
+			  <th>TUMUKUNDE HENRY KAKURUGU:</th>
+			  <td> {{TUMUKUNDE }} </td>
+		
+			</tr>
+			<tr>
+			  <th>YOWERI MUSEVENI TIBUHABURWA KAGUTA:</th>
+			  <td>{{YOWERI }} </td>
+			</tr>
+
+				<th> Reg Voters:</th>
+				<td>{{Reg Voters}}</td>
+			</tr>
+			<tr>
+				<th>Total Votes:</th>
+				<td>{{TotalVotes}} </td>
+			</tr>
+			<tr>
+				<th>Invalid Votes:</th>
+				<td>{{InvalidVotes}} </td>
+			</tr>
+		
+		<tr>
+			<th>Valid Votes:</th>
+			<td>{{ValidVotes}} </td>
+		</tr>
+		<tr>
+			<th>No of received Stations:</th>
+			<td>{{Received Station}} </td>
+		</tr>
+		
+		
+
+	      </table>	      
+	    </script> 
+
+
+		<!-- Tooltip div -->
+		<div id="tooltip">
+		<p class="name"></p>
+		<p class="value"></p>
+		<p class="ValidVotes"></p>
+		<p class="InvalidVotes"></p>
+		<p class="TotalVotes"></p>
+		<p class="AMURIAT"></p>
+		<p class="KABULETA"></p>
+		<p class="KALEMBE"></p>
+		<p class="KATUMBA"></p>
+		<p class="kYAGULANYI"></p>
+		<p class="NOBERT"></p>
+		<p class="MAYAMBALA"></p>
+		<p class="MUNTU"></p>
+		<p class="MWESIGYE"></p>
+		<p class="TUMUKUNDE"></p>
+		<p class="YOWERI"></p>
+
+		
+		</div>
+
+
+		<!-- JS Libraries -->
+		<script src="http://d3js.org/d3.v3.min.js" charset="utf-8"></script>
+		<script src="http://cdnjs.cloudflare.com/ajax/libs/mustache.js/2.2.1/mustache.min.js"></script>
+
+		<!-- Custom JS code -->
+		<script src="map.js"></script>
+	</body>
+</html>
